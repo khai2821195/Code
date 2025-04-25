@@ -31,7 +31,9 @@
     * "스테이징된 변경 사항" 섹션 위의 텍스트 상자에 커밋 메시지를 작성합니다.
     * 메시지 작성 후 **`Ctrl + Enter` (Windows/Linux) 또는 `Cmd + Enter` (macOS)** 키를 눌러 커밋을 실행합니다.
 * **터미널에서:**
-    * `git commit -m "커밋 메시지"` 명령어를 사용합니다. (예: `git commit -m "feat: 새로운 기능 추가"`)
+    * `git commit -m "커밋 메시지"` 명령어를 사용합니다.
+      ```javascript
+      git commit -m "feat: 새로운 기능 추가"
 
 ## 4. 푸시 (Push)
 
@@ -39,7 +41,9 @@
 * **VS Code 소스 제어 탭에서:**
     * 상단의 **`...` (더보기) 아이콘을 클릭**하고 "푸시"를 선택합니다.
 * **터미널에서:**
-    * `git push origin <브랜치 이름>` 명령어를 사용합니다. (일반적으로 첫 번째 브랜치는 `master` 또는 `main`입니다. 예: `git push origin master`)
+    * `git push origin <브랜치 이름>` 명령어를 사용합니다. (일반적으로 첫 번째 브랜치는 `master` 또는 `main`입니다.)
+      ```javascript
+      git push origin master
 
 이제 이 `README.md` 파일을 Git 저장소에 추가하고 커밋하여 원격 저장소에 올려두면 됩니다.
 
