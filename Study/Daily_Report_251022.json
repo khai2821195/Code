@@ -1,0 +1,400 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "037ed99a-21d5-40c0-b285-a8362db2ffcc",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1280,
+        460
+      ],
+      "id": "cb1cc42c-b9ca-4177-8b42-acccf111b512",
+      "name": "Webhook",
+      "webhookId": "037ed99a-21d5-40c0-b285-a8362db2ffcc"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api-alimtalk.cloud.toast.com/alimtalk/v2.0/appkeys/YuIB1lEDj8vuqME2/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json;charset=UTF-8"
+            },
+            {
+              "name": "X-Secret-Key",
+              "value": "BqbvtCkwuidB28H7cuoYGheQ8SyEWOWw"
+            },
+            {
+              "name": "X-App-Key",
+              "value": "YuIB1lEDj8vuqME2"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "senderKey",
+              "value": "7780249050d98477b04a1b589e4794c8ac1f7a78"
+            },
+            {
+              "name": "templateCode",
+              "value": "Math4U-edu-2025002"
+            },
+            {
+              "name": "recipientList",
+              "value": "={{ $json.finalJson }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -360,
+        460
+      ],
+      "id": "7553444d-40da-485e-8ab6-549f41431aa8",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $('Webhook').item.json.body.data.id }}",
+          "mode": "id"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "보고서 발송|checkbox",
+              "checkboxValue": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -120,
+        460
+      ],
+      "id": "31522f7f-e9d3-46dd-ba68-408f89d2bcd7",
+      "name": "Notion",
+      "credentials": {
+        "notionApi": {
+          "id": "q0CR8H0tBmQfGXS5",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## NHN Cloud API 연결
+**Double click** to edit me.
+카카오 알림톡 템플릿
+math4u-edu-2025002
+
+
+
+
+
+
+
+
+[Guide](https://docs.n8n.io/workflows/sticky-notes/)",
+        "height": 420,
+        "width": 220
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -424,
+        324
+      ],
+      "typeVersion": 1,
+      "id": "7b1bac6c-4a54-4a70-aa74-c32c6f9aedd6",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Webhook
+Notion에서 학습리포트 발송버튼을 클릭하면 Webhook 발동. [Guide](https://docs.n8n.io/workflows/sticky-notes/)",
+        "height": 420,
+        "width": 220
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1340,
+        320
+      ],
+      "typeVersion": 1,
+      "id": "38499f41-03f7-4b40-9635-97c8f3ab80e6",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "height": 560,
+        "width": 220
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -184,
+        180
+      ],
+      "typeVersion": 1,
+      "id": "69198d61-313b-4a7f-85e2-14e5f4aef58e",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $json.body.data.properties;
+
+// 📌 공통 파라미터
+const commonParams = {
+  url_day: $json.body.data.id,
+  학생이름: data[\"학생이름(S)\"].formula.string,
+  수업날짜: data[\"수업일시(S)\"].formula.string,
+  요일: data[\"요일\"].formula.string,
+  수업회차: data[\"수업회차(S)\"].formula.string,
+  과정: data[\"과정(S)\"].formula.string,
+  수업내용: data[\"진도/수업 내용\"].rollup.array[0]?.rich_text[0]?.plain_text || ""
+};
+
+// 📌 수신자 배열
+const list = [];
+
+// 연락처1 (필수)
+if (data[\"학부모연락처 1(S)\"].formula.string) {
+  list.push({
+    recipientNo: data[\"학부모연락처 1(S)\"].formula.string,
+    templateParameter: commonParams
+  });
+}
+
+// 연락처2 (있으면 추가)
+if (data[\"학부모연락처 2(S)\"].formula.string) {
+  list.push({
+    recipientNo: data[\"학부모연락처 2(S)\"].formula.string,
+    templateParameter: commonParams
+  });
+}
+
+// 📌 숫자만 추출하는 함수
+function extractNumber(str) {
+  const match = (str || "").match(/\\d+/);
+  return match ? parseInt(match[0], 10) : null;
+}
+
+// 수업회차(S) 숫자
+const numFromSession = extractNumber(data[\"수업회차(S)\"].formula.string);
+// 과정(S) 숫자
+const numFromCourse = extractNumber(data[\"과정(S)\"].formula.string);
+
+// 비교 결과
+let sendPaymentNotice = false;
+if (numFromSession !== null && numFromCourse !== null && numFromSession === numFromCourse) {
+  sendPaymentNotice = true;
+}
+
+// 최종 결과 리턴
+return [{
+  json: {
+    recipientList: list,
+    sendPaymentNotice
+  }
+}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1040,
+        460
+      ],
+      "id": "75498f43-4ed5-4625-a967-08d0da4d3764",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "height": 420,
+        "width": 220
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1104,
+        320
+      ],
+      "typeVersion": 1,
+      "id": "b409c224-20de-4cc8-ae19-dd3abd80aad1",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4d236c18-3c4d-4037-ba27-d4b21d4dfa4f",
+              "leftValue": "={{ $now.hour }}",
+              "rightValue": 22,
+              "operator": {
+                "type": "number",
+                "operation": "smaller",
+                "name": "filter.operator.smaller"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -600,
+        460
+      ],
+      "id": "1b17b153-002c-44a8-83d0-ec43e5d537d8",
+      "name": "10시 이전인가?"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fde62cf0-98f4-4e3c-9b37-a458a8fc29fc",
+              "name": "finalJson",
+              "value": "={{ $json.recipientList }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -820,
+        460
+      ],
+      "id": "b201cabc-e37e-477f-8d58-f224a712a754",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "mode": "until",
+        "time": {
+          "__rl": true,
+          "value": "={{ $now.plus({ days: 1 }).set({ hour: 15, minute: 0, second: 0, millisecond: 0 }).toISO() }}",
+          "mode": "expression"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 2,
+      "position": [
+        -600,
+        700
+      ],
+      "id": "5f7f1b3a-8c9d-4e0a-9b1c-2d3f4e5a6b7c",
+      "name": "다음날 3시까지 대기"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Notion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "다음날 3시까지 대기",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "10시 이전인가?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "다음날 3시까지 대기": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "42c40a3b0e702882e5efb1e0bfa1f181054ea2f804caec8b597ee1dd0e202dec"
+  }
+}
