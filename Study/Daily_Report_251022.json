@@ -9,10 +9,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -1280,
-        460
+        -1616,
+        288
       ],
-      "id": "cb1cc42c-b9ca-4177-8b42-acccf111b512",
+      "id": "8e59d208-55c1-4a06-a120-9da72958ac10",
       "name": "Webhook",
       "webhookId": "037ed99a-21d5-40c0-b285-a8362db2ffcc"
     },
@@ -21,7 +21,7 @@
         "method": "POST",
         "url": "https://api-alimtalk.cloud.toast.com/alimtalk/v2.0/appkeys/YuIB1lEDj8vuqME2/messages",
         "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
+        "genericAuthType": "httpCustomAuth",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -61,11 +61,17 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -360,
-        460
+        -352,
+        272
       ],
-      "id": "7553444d-40da-485e-8ab6-549f41431aa8",
-      "name": "HTTP Request"
+      "id": "492305e6-6ca1-4a90-800e-7131f3643c4f",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "kCMpN7b6ZtLpHBDn",
+          "name": "Custom Auth account"
+        }
+      }
     },
     {
       "parameters": {
@@ -86,124 +92,33 @@
         },
         "options": {}
       },
-            "type": "n8n-nodes-base.notion",
-            "typeVersion": 2.2,
-            "position": [
-              -120,
-              460
-            ],
-            "id": "31522f7f-e9d3-46dd-ba68-408f89d2bcd7",
-            "name": "Notion",
-            "credentials": {
-              "notionApi": {
-                "id": "q0CR8H0tBmQfGXS5",
-                "name": "Notion account"
-              }
-            }
-          },
-          {
-            "parameters": {
-              "content": "## NHN Cloud API 연결\r\n**Double click** to edit me.\r\n카카오 알림톡 템플릿\r\nmath4u-edu-2025002\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n[Guide](https://docs.n8n.io/workflows/sticky-notes/)",
-              "height": 420,
-              "width": 220
-            },
-            "type": "n8n-nodes-base.stickyNote",
-            "position": [
-              -424,
-              324
-            ],
-            "typeVersion": 1,
-            "id": "7b1bac6c-4a54-4a70-aa74-c32c6f9aedd6",
-                  "name": "Sticky Note"
-                },
-                {
-                  "parameters": {
-                    "content": "## Webhook\r\nNotion에서 학습리포트 발송버튼을 클릭하면 Webhook 발동. [Guide](https://docs.n8n.io/workflows/sticky-notes/)",
-                    "height": 420,
-                    "width": 220
-                  },
-                  "type": "n8n-nodes-base.stickyNote",
-                  "position": [
-                    -1340,
-                    320
-                  ],
-                  "typeVersion": 1,
-                  "id": "38499f41-03f7-4b40-9635-97c8f3ab80e6",
-                  "name": "Sticky Note1"
-                },    {
-      "parameters": {
-        "height": 560,
-        "width": 220
-      },
-      "type": "n8n-nodes-base.stickyNote",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
       "position": [
-        -184,
-        180
+        -112,
+        272
       ],
-      "typeVersion": 1,
-      "id": "69198d61-313b-4a7f-85e2-14e5f4aef58e",
-      "name": "Sticky Note2"
+      "id": "ae4482f6-05e6-4b40-aabc-d1fdd52974de",
+      "name": "Notion",
+      "credentials": {
+        "notionApi": {
+          "id": "q0CR8H0tBmQfGXS5",
+          "name": "Notion account"
+        }
+      }
     },
     {
       "parameters": {
-        "jsCode": "const data = $json.body.data.properties;\r\n\r\n// 📌 공통 파라미터\r\nconst commonParams = {\r\n  url_day: $json.body.data.id,\r\n  학생이름: data[\"학생이름(S)\"].formula.string,\r\n  수업날짜: data[\"수업일시(S)\"].formula.string,\r\n  요일: data[\"요일\"].formula.string,\r\n  수업회차: data[\"수업회차(S)\"].formula.string,\r\n  과정: data[\"과정(S)\"].formula.string,\r\n  수업내용: data[\"진도/수업 내용\"].rollup.array[0]?.rich_text[0]?.plain_text || \"\"\r\n};\r\n\r\n// 📌 수신자 배열\r\nconst list = [];\r\n\r\n// 연락처1 (필수)\r\nif (data[\"학부모연락처 1(S)\"].formula.string) {\r\n  list.push({\r\n    recipientNo: data[\"학부모연락처 1(S)\"].formula.string,\r\n    templateParameter: commonParams\r\n  });\r\n}\r\n\r\n// 연락처2 (있으면 추가)\r\nif (data[\"학부모연락처 2(S)\"].formula.string) {\r\n  list.push({\r\n    recipientNo: data[\"학부모연락처 2(S)\"].formula.string,\r\n    templateParameter: commonParams\r\n  });\r\n}\r\n\r\n// 📌 숫자만 추출하는 함수\r\nfunction extractNumber(str) {\r\n  const match = (str || \"\").match(/\\d+/);\r\n  return match ? parseInt(match[0], 10) : null;\r\n}\r\n\r\n// 수업회차(S) 숫자\r\nconst numFromSession = extractNumber(data[\"수업회차(S)\"].formula.string);\r\n// 과정(S) 숫자\r\nconst numFromCourse = extractNumber(data[\"과정(S)\"].formula.string);\r\n\r\n// 비교 결과\r\nlet sendPaymentNotice = false;\r\nif (numFromSession !== null && numFromCourse !== null && numFromSession === numFromCourse) {\r\n  sendPaymentNotice = true;\r\n}\r\n\r\n// 최종 결과 리턴\r\nreturn [{\r\n  json: {\r\n    recipientList: list,\r\n    sendPaymentNotice\r\n  }\r\n}];"
+        "jsCode": "const data = $json.body.data.properties;\n\n// 📌 공통 파라미터\nconst commonParams = {\n  url_day: $json.body.data.id,\n  학생이름: data[\"학생이름(S)\"].formula.string,\n  수업날짜: data[\"수업일시(S)\"].formula.string,\n  요일: data[\"요일\"].formula.string,\n  수업회차: data[\"수업회차(S)\"].formula.string,\n  과정: data[\"과정(S)\"].formula.string,\n  수업내용: data[\"진도/수업 내용\"].rollup.array[0]?.rich_text[0]?.plain_text || \"\"\n};\n\n// 📌 수신자 배열\nconst list = [];\n\n// 연락처1 (필수)\nif (data[\"학부모연락처 1(S)\"].formula.string) {\n  list.push({\n    recipientNo: data[\"학부모연락처 1(S)\"].formula.string,\n    templateParameter: commonParams\n  });\n}\n\n// 연락처2 (있으면 추가)\nif (data[\"학부모연락처 2(S)\"].formula.string) {\n  list.push({\n    recipientNo: data[\"학부모연락처 2(S)\"].formula.string,\n    templateParameter: commonParams\n  });\n}\n\n// 📌 숫자만 추출하는 함수\nfunction extractNumber(str) {\n  const match = (str || \"\").match(/\\d+/);\n  return match ? parseInt(match[0], 10) : null;\n}\n\n// 수업회차(S) 숫자\nconst numFromSession = extractNumber(data[\"수업회차(S)\"].formula.string);\n// 과정(S) 숫자\nconst numFromCourse = extractNumber(data[\"과정(S)\"].formula.string);\n\n// 비교 결과\nlet sendPaymentNotice = false;\nif (numFromSession !== null && numFromCourse !== null && numFromSession === numFromCourse) {\n  sendPaymentNotice = true;\n}\n\n// 최종 결과 리턴\nreturn [{\n  json: {\n    recipientList: list,\n    sendPaymentNotice\n  }\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1040,
-        460
+        -1376,
+        288
       ],
-      "id": "75498f43-4ed5-4625-a967-08d0da4d3764",
+      "id": "c0b16b68-a758-4e4b-9ec5-c5e6973f7226",
       "name": "Code"
-    },
-    {
-      "parameters": {
-        "height": 420,
-        "width": 220
-      },
-      "type": "n8n-nodes-base.stickyNote",
-      "position": [
-        -1104,
-        320
-      ],
-      "typeVersion": 1,
-      "id": "b409c224-20de-4cc8-ae19-dd3abd80aad1",
-      "name": "Sticky Note3"
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 2
-          },
-          "conditions": [
-            {
-              "id": "4d236c18-3c4d-4037-ba27-d4b21d4dfa4f",
-              "leftValue": "={{ $now.hour }}",
-              "rightValue": 22,
-              "operator": {
-                "type": "number",
-                "operation": "smaller",
-                "name": "filter.operator.smaller"
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.2,
-      "position": [
-        -600,
-        460
-      ],
-      "id": "1b17b153-002c-44a8-83d0-ec43e5d537d8",
-      "name": "10시 이전인가?"
     },
     {
       "parameters": {
@@ -222,30 +137,119 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -820,
-        460
+        -1152,
+        288
       ],
-      "id": "b201cabc-e37e-477f-8d58-f224a712a754",
+      "id": "d9b13a80-6776-4c17-b5f2-6411cccf1f55",
       "name": "Edit Fields"
     },
     {
       "parameters": {
-        "mode": "until",
-        "time": {
-          "__rl": true,
-          "value": "={{ $now.plus({ days: 1 }).set({ hour: 15, minute: 0, second: 0, millisecond: 0 }).toISO() }}",
-          "mode": "expression"
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4d236c18-3c4d-4037-ba27-d4b21d4dfa4f",
+              "leftValue": "={{ $now.hour }}",
+              "rightValue": 15,
+              "operator": {
+                "type": "number",
+                "operation": "gte",
+                "name": "filter.operator.gte"
+              }
+            },
+            {
+              "id": "1861802f-f498-47dd-b191-9d0b2d782390",
+              "leftValue": "={{ $now.hour }}",
+              "rightValue": 22,
+              "operator": {
+                "type": "number",
+                "operation": "smaller",
+                "name": "filter.operator.smaller"
+              }
+            }
+          ],
+          "combinator": "and"
         },
         "options": {}
       },
-      "type": "n8n-nodes-base.wait",
-      "typeVersion": 2,
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
       "position": [
-        -600,
-        700
+        -928,
+        288
       ],
-      "id": "5f7f1b3a-8c9d-4e0a-9b1c-2d3f4e5a6b7c",
-      "name": "다음날 3시까지 대기"
+      "id": "6138e639-95cf-4b52-8378-8f18fd1d0386",
+      "name": "오후 3시-10시 사이인가?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4d236c18-3c4d-4037-ba27-d4b21d4dfa4f",
+              "leftValue": "={{ $now.hour }}",
+              "rightValue": 22,
+              "operator": {
+                "type": "number",
+                "operation": "gte",
+                "name": "filter.operator.gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -720,
+        464
+      ],
+      "id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+      "name": "밤 10시 이후인가?"
+    },
+    {
+      "parameters": {
+        "resume": "specificTime",
+        "dateTime": "={{ luxon.DateTime.fromISO($workflow.startedAt).setZone('Asia/Seoul').plus({ days: 1 }).set({ hour: 15, minute: 0, second: 0, millisecond: 0 }).toUTC().toFormat('yyyy-MM-dd\'T\'HH:mm:ss') }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -520,
+        368
+      ],
+      "id": "c4f1172e-eb63-4367-9810-4bc5a56eb211",
+      "name": "다음날 3시까지 대기",
+      "webhookId": "a8731fd5-336a-4876-80e5-494a92dfe3e1"
+    },
+    {
+      "parameters": {
+        "resume": "specificTime",
+        "dateTime": "={{ luxon.DateTime.fromISO($workflow.startedAt).setZone('Asia/Seoul').set({ hour: 15, minute: 0, second: 0, millisecond: 0 }).toUTC().toFormat('yyyy-MM-dd\'T\'HH:mm:ss') }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -520,
+        544
+      ],
+      "id": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
+      "name": "당일 3시까지 대기",
+      "webhookId": "a8731fd5-336a-4876-80e5-494a92dfe3e2"
     }
   ],
   "connections": {
@@ -282,7 +286,18 @@
         ]
       ]
     },
-    "If": {
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "오후 3시-10시 사이인가?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "오후 3시-10시 사이인가?": {
       "main": [
         [
           {
@@ -293,18 +308,25 @@
         ],
         [
           {
-            "node": "다음날 3시까지 대기",
+            "node": "밤 10시 이후인가?",
             "type": "main",
-            "index": 1
+            "index": 0
           }
         ]
       ]
     },
-    "Edit Fields": {
+    "밤 10시 이후인가?": {
       "main": [
         [
           {
-            "node": "10시 이전인가?",
+            "node": "다음날 3시까지 대기",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "당일 3시까지 대기",
             "type": "main",
             "index": 0
           }
@@ -321,11 +343,21 @@
           }
         ]
       ]
+    },
+    "당일 3시까지 대기": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "pinData": {},
   "meta": {
-    "templateCredsSetupCompleted": true,
     "instanceId": "42c40a3b0e702882e5efb1e0bfa1f181054ea2f804caec8b597ee1dd0e202dec"
   }
 }
